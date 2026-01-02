@@ -3,6 +3,7 @@ import random
 from user_manager import UserManager
 import data_words.file_process as f
 
+
 def display_result(wordle):
     if " " in wordle.secret:
         vn_words =[]
