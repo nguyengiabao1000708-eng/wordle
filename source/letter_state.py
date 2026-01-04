@@ -1,4 +1,3 @@
-
 class Letter_state:
     def __init__(self, char):
         self.character = char

@@ -14,7 +14,7 @@ class UserNode:
 class UserManager:
     def __init__(self):
         self.head = None
-        self.file_path = "data_users/users.bin"
+        self.file_path = "data/users_data/users.bin"
         self.name_size = 10
         self.int_size = 4
         self.record_size = 26

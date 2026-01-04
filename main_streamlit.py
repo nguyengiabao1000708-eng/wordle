@@ -1,8 +1,8 @@
 import streamlit as st
 import random
-from user_manager import UserManager
-from wordle_logic_streamlit import Wordle
-import data_words.file_process as f
+from source import UserManager, Wordle
+# import source.file_process as f
+
 
 st.set_page_config(page_title="Wordle HCMUS", layout="centered")
 
@@ -10,7 +10,7 @@ def local_css(file_name):
     with open (file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
-local_css("style.css")
+local_css("source/static/style.css")
 
 def get_random_word(file_path):
     try:
@@ -43,7 +43,7 @@ def render_wordle_board(attempts, wordle):
 
     for _ in range (wordle.attempts_remaining()):
         board_html += '<div class="wordle-row">'
-        for _ in range(5):
+        for _ in range(len(wordle.secret)):
             # Bạn có thể thêm class .tile-empty vào CSS nếu muốn viền nhạt hơn
             board_html += '<div class="tile"></div>'
         board_html += '</div>'
@@ -57,7 +57,7 @@ def already_guessed(guess, wordle):
 
 # 1. Khởi tạo Session State
 if "wordle" not in st.session_state:
-    st.session_state.wordle = Wordle(get_random_word("data_words/valid_word_with_length_n.txt"))
+    st.session_state.wordle = Wordle(get_random_word("source/data/words_data/valid_word_with_length_n.txt"))
     st.session_state.game_over = False
     st.session_state.is_win = False
 
@@ -67,20 +67,20 @@ target = wordle.secret
 
 st.title("Wordle Minimalist")
 
-st.write(f"the word is {target}")
+# st.write(f"the word is {target}")
 
 render_wordle_board(wordle.attempts, wordle)
 
 
 if not st.session_state.game_over:
-    guess = st.text_input("Guess the word: ", max_chars = 5).upper()
+    guess = st.text_input("Guess the word: ", max_chars = 6).upper()
     
     if st.button("enter"):
-        if len(guess) < 5:
+        if len(guess) < 6:
             st.warning("Vui lòng nhập đủ 5 chữ cái!")
         elif already_guessed(guess,wordle):
             st.warning("Từ này đã được đoán!")
-        elif not check_valid_words(guess,"data_words/word_with_length_n.txt"):
+        elif not check_valid_words(guess,"source/data/words_data/word_with_length_n.txt"):
             st.warning("Từ không tồn tại")
         else:
             wordle.attempts.append(guess)
@@ -88,15 +88,17 @@ if not st.session_state.game_over:
                 st.session_state.game_over = True
                 st.session_state.is_win = True
             elif wordle.attempts_remaining() ==0 :
-
                 st.session_state.game_over = True
             st.rerun()  
 
 else:
     if st.session_state.is_win:
         st.success("You win")
+        st.write(f"The word is: {wordle.secret}")   
     else:
+        st.write(f"The word is: {wordle.secret}") 
         st.warning("you lose")
+    
 
     if st.button("Restart Game"):
         del st.session_state.is_win

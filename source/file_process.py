@@ -1,6 +1,6 @@
-pre = "data_words/raw_data/"
-valid_words_n = "data_words/valid_word_with_length_n.txt"
-words_n = "data_words/word_with_length_n.txt"
+pre = "data/words_data/"
+valid_words_n = "data/words_data/valid_word_with_length_n.txt"
+words_n = "data/words_data/word_with_length_n.txt"
 
 def choose_file(n,file_input,file_output):
     valid_word =[]
@@ -36,19 +36,7 @@ def main():
             break
         else:
             print("Unvalid, please type again!!")
-
-
-# words = []
-# with open("vi_dictionary.csv", "r") as f:
-#     line = f.readlines()
-#     print(len(line))
-#     for i in line:
-#         i = i.strip().split(",")
-#         words.append(i[0])
-#     print(words)
-# with open("word_with_length_n.txt", "w") as wf:
-#     for i in words:
-#         wf.write(f"{i}\n")
+main()
 
 
 

@@ -1,7 +1,13 @@
-from wordle_logic import Wordle
 import random
-from user_manager import UserManager
-import data_words.file_process as f
+from letter_state_old import Letter_state
+from wordle_logic import Wordle
+from user_manager_old import UserManager
+import file_process_old as f
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+base_data_path = os.path.join(current_dir, "..", "data", "words_data")
+pre = base_data_path + "/"
 
 
 def display_result(wordle):
@@ -68,7 +74,7 @@ def main():
     user= UserManager()
     user.load_data()
 
-    wordle = Wordle(words("data_words/valid_word_with_length_n.txt"))
+    wordle = Wordle(words( pre + "valid_word_with_length_n.txt"))
     is_win = False
 
 
@@ -101,7 +107,7 @@ def main():
         if len(guess) != wordle.WORDS_LENGTH:
             print(f"the word's length is {wordle.WORDS_LENGTH} ")
             continue
-        if check_valid_words(guess,"data_words/word_with_length_n.txt") == False:
+        if check_valid_words(guess, pre +  "word_with_length_n.txt") == False:
             print("Not a real word !!")
             continue
 

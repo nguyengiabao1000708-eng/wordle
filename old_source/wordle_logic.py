@@ -1,4 +1,4 @@
-from projects.wordle.source.letter_state import Letter_state
+from letter_state_old import Letter_state
 from collections import Counter
 
 class Wordle:
