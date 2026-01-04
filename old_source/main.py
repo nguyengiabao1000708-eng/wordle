@@ -49,8 +49,6 @@ def check_valid_words(word,file):
             return False
         else:
             return True
-    
-
 
 def main():
 
@@ -72,6 +70,8 @@ def main():
 
     wordle = Wordle(words("data_words/valid_word_with_length_n.txt"))
     is_win = False
+
+
 
     while wordle.can_attempts():
         display_result(wordle)

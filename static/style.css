@@ -1,0 +1,37 @@
+/* style.css */
+
+/* Container chứa cả bảng game */
+.wordle-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+/* Container cho mỗi hàng chữ */
+.wordle-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Định dạng từng ô chữ đơn lẻ */
+.tile {
+    width: 58px;
+    height: 58px;
+    border: 2px solid #3a3a3c; /* Màu viền xám tối của Wordle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+/* Màu sắc trạng thái ô chữ */
+.tile-correct { background-color: #538d4e; border-color: #538d4e; } /* Xanh lá */
+.tile-present { background-color: #b59f3b; border-color: #b59f3b; } /* Vàng cam */
+.tile-absent  { background-color: #3a3a3c; border-color: #3a3a3c; } /* Xám */
