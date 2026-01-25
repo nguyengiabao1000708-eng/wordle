@@ -17,31 +17,8 @@ def init_states():
         st.session_state.diff = "Easy"
     if "username" not in st.session_state:
         st.session_state.username = ""
-
-
-#Những hàm liên quan đến thanh bar điều hướng
-def hide_sidebar():
-    st.markdown(
-        """
-        <style>
-            /* Ẩn hoàn toàn sidebar */
-            [data-testid="stSidebar"] {
-                display: none;
-            }
-            /* Ẩn luôn nút mũi tên để mở sidebar (Collapsed Control) */
-            [data-testid="collapsedControl"] {
-                display: none;
-            }
-            /* Mở rộng phần nội dung chính ra giữa màn hình khi không còn sidebar */
-            .main .block-container {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
+    if "has_saved" not in st.session_state:
+        st.session_state.has_saved = False
 
 def change_mode():
     with st.popover("Đổi Mode", icon= "😎"):
@@ -90,13 +67,9 @@ def navigation():
         change_mode()
     with col2:
         if st.button("Thông số người chơi", icon= "📈", use_container_width=True):
-            if st.session_state.game_over == True:
-                del st.session_state.is_win
-                del st.session_state.wordle
-                del st.session_state.game_over
             st.switch_page("pages/player_stats.py")
 
-    with col3:
+    with col3: 
         if st.button("Bảng xếp hạng", icon= "📉", use_container_width=True):
             st.switch_page("pages/ranking.py")
     with col4:
@@ -258,7 +231,6 @@ def already_guessed(guess, wordle):
 def main():
     st.set_page_config(page_title="Wordle HCMUS", layout="centered", initial_sidebar_state="collapsed")
     st.title("Wordle Minimalist")
-    hide_sidebar()
 
     init_states()
     wordle = st.session_state.wordle
@@ -296,24 +268,31 @@ def main():
     #             st.rerun()  
 
     else:
+
+        if not st.session_state.has_saved :
+            if st.session_state.is_win:
+                    user_manager.update_data(username, True)
+            else:
+                    user_manager.update_data(username, False)
+
+            if username:      
+                user_manager.save_data()
+
+            st.session_state.has_saved = True
+
+        if st.session_state.is_win:
+            st.success(f"Chúc mừng! Bạn đã đoán đúng từ '{target}'")
+        else:
+            st.error(f"Bạn đã thua! Từ đúng là '{target}'")
+    
         if st.button("new game"):
             del st.session_state.is_win
             del st.session_state.wordle
             del st.session_state.game_over
+            del st.session_state.cur_guess
+            del st.session_state.has_saved
             st.rerun()
 
-        if st.session_state.is_win:
-            st.success("You win")
-            st.write(f"The word is: {target}")
-            if username != "":
-                user_manager.update_data(username, True)
-        else:
-            st.write(f"The word is: {target}") 
-            st.warning("you lose")
-            if username != "":      
-                user_manager.update_data(username, False)
-        if username != "":      
-            user_manager.save_data()
             
 
 

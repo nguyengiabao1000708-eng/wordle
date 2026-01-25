@@ -143,6 +143,7 @@ class UserManager:
                 rank_list.append(itr) 
                 itr = itr.next
             
+
             rank_list.sort(key=lambda x: x.games_played, reverse=True)
             
             top_5 = rank_list[:5]
