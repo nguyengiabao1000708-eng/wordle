@@ -233,7 +233,7 @@ def already_guessed(guess, wordle):
 
 # HÀM CHÍNH
 def main():
-    st.set_page_config(page_title="Wordle HCMUS", layout="centered")
+    st.set_page_config(page_title="Wordle HCMUS", layout="centered", initial_sidebar_state="collapsed")
     st.title("Wordle Minimalist")
 
     init_states()
