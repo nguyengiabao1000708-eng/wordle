@@ -3,8 +3,9 @@ import os
 from datetime import date
 
 class UserNode:
-    def __init__(self, username):
+    def __init__(self, username, password):
         self.username = username
+        self.password = password
         self.games_played = 0
         self.total_wins = 0
         self.cur_streak = 0
@@ -16,8 +17,9 @@ class UserManager:
         self.head = None
         self.file_path = "source/data/users_data/users.bin"
         self.name_size = 10
+        self.password_size = 10
         self.int_size = 4
-        self.record_size = 26
+        self.record_size = 36 # 10 + 10 + 4 + 4 + 4 + 4
 
     def save_data(self):
         if self.is_empty():
@@ -31,10 +33,13 @@ class UserManager:
                 name_bytes = current.username.encode('utf-8')[:self.name_size]
                 buffer[0:len(name_bytes)] = name_bytes 
                 
-                buffer[10:14] = current.games_played.to_bytes(self.int_size, 'little')
-                buffer[14:18] = current.total_wins.to_bytes(self.int_size, 'little')
-                buffer[18:22] = current.cur_streak.to_bytes(self.int_size, 'little')
-                buffer[22:26] = current.best_streak.to_bytes(self.int_size, 'little')
+                password_bytes = current.password.encode('utf-8')[:self.password_size]
+                buffer[10:len(password_bytes) + 10] = password_bytes
+
+                buffer[20:24] = current.games_played.to_bytes(self.int_size, 'little')
+                buffer[24:28] = current.total_wins.to_bytes(self.int_size, 'little')
+                buffer[28:32] = current.cur_streak.to_bytes(self.int_size, 'little')
+                buffer[32:36] = current.best_streak.to_bytes(self.int_size, 'little')
                 
                 f.write(buffer)
                 current = current.next
@@ -51,13 +56,14 @@ class UserManager:
                     break
                 
                 username = data[0:10].decode('utf-8', errors='ignore').rstrip('\x00')
-                
-                user_node = self.insert_at_beginning(username)
-                
-                user_node.games_played = int.from_bytes(data[10:14], 'little')
-                user_node.total_wins   = int.from_bytes(data[14:18], 'little')
-                user_node.cur_streak   = int.from_bytes(data[18:22], 'little')
-                user_node.best_streak  = int.from_bytes(data[22:26], 'little')
+                password = data[10:20].decode('utf-8', errors='ignore').rstrip('\x00')
+
+                user_node = self.insert_at_beginning(username, password)
+
+                user_node.games_played = int.from_bytes(data[20:24], 'little')
+                user_node.total_wins   = int.from_bytes(data[24:28], 'little')
+                user_node.cur_streak   = int.from_bytes(data[28:32], 'little')
+                user_node.best_streak  = int.from_bytes(data[32:36], 'little')
 
     # def load_data(self):
     #     with open(self.file_path, "r") as f:
@@ -79,9 +85,9 @@ class UserManager:
     #             line =f"{current.username}|{current.games_played}|{current.total_wins}|{current.cur_streak}|{current.best_streak}\n"
     #             f.write(line)
     #             current = current.next
-    
-    def insert_at_beginning(self, username):
-        new_node = UserNode(username)
+
+    def insert_at_beginning(self, username, password):
+        new_node = UserNode(username, password)
         new_node.next = self.head
         self.head = new_node
         return new_node
@@ -89,7 +95,7 @@ class UserManager:
     def is_empty(self):
         return self.head == None
     
-    def update_data(self,username, is_win):
+    def update_data(self, username, is_win):
         user = self.get_player(username)
         user.games_played +=1
         if is_win == True:
@@ -101,18 +107,18 @@ class UserManager:
             user.cur_streak = 0
 
 
-    def get_player(self,username):
-        if self.is_empty():
-            user = self.create_new_player(username)
-        elif self.player_is_exist(username) == False:
-            user = self.create_new_player(username)
-        else:
-            user = self.player_is_exist(username)
+    def get_player(self, username):
+        # if self.is_empty():
+        #     user = self.create_new_player(username, password)
+        # elif self.player_is_exist(username) == False:
+        #     user = self.create_new_player(username, password)
+        # else:
+        user = self.player_is_exist(username)
         return user
 
 
-    def create_new_player(self,username):
-        new_user = self.insert_at_beginning(username)
+    def create_new_player(self, username, password):
+        new_user = self.insert_at_beginning(username, password)
         return new_user
 
 
@@ -127,8 +133,8 @@ class UserManager:
             itr = itr.next
         return False
 
-    def player_statistics(self,username):
-        user = self.get_player(username)
+    def player_statistics(self,username, password):
+        user = self.get_player(username, password)
         return(f"{user.games_played}{user.total_wins}{user.cur_streak}{user.best_streak}")
 
 
@@ -145,13 +151,31 @@ class UserManager:
             
 
             rank_list.sort(key=lambda x: x.games_played, reverse=True)
-            
             top_5 = rank_list[:5]
-
             list = []
 
             for i in top_5:
                 list.append((i.username, i.games_played))
+            return list
+    
+    def ranking_total_wins_games(self):
+            if self.is_empty():
+                print("No player")
+                return
+            
+            rank_list = []
+            itr = self.head
+            while itr:
+                rank_list.append(itr) 
+                itr = itr.next
+            
+
+            rank_list.sort(key=lambda x: x.total_wins, reverse=True)
+            top_5 = rank_list[:5]
+            list = []
+
+            for i in top_5:
+                list.append((i.username, i.total_wins))
             return list
 
 

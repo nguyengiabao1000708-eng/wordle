@@ -73,8 +73,7 @@ def navigation():
         if st.button("Bảng xếp hạng", icon= "📉", use_container_width=True):
             st.switch_page("pages/ranking.py")
     with col4:
-        if st.button("Login", icon= "👤", use_container_width=True):
-            st.switch_page("pages/login.py")
+        username()
 
 
 
@@ -147,7 +146,7 @@ def render_keyboard(length_limit, wordle):
             row1[i].button(char, on_click = add_char, args = (char, length_limit),
                             use_container_width = True,type = color )
             
-        row2 = st.columns([1.4] + [1]*len(keys[1]) + [1.4])
+        row2 = st.columns([1.5] + [1]*len(keys[1]) + [1.5])
 
         row2[0].button("UNDO", on_click = wordle.undo,
                         use_container_width = True)
@@ -346,7 +345,6 @@ def main():
                 del st.session_state.has_saved
                 st.rerun()
     else:
-        
         if st.session_state.game_over == False:
             render_keyboard(len(target), wordle)
         else:
@@ -366,7 +364,6 @@ def main():
                 st.success(f"Chúc mừng! Bạn đã đoán đúng từ '{target}'")
             else:
                 st.error(f"Bạn đã thua! Từ đúng là '{target}'")
-            st.warning("Vui lòng đăng nhập để thông tin của bạn được lưu!")
         
             if st.button("new game"):
                 del st.session_state.is_win
