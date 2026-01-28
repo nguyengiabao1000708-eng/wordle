@@ -22,6 +22,7 @@ class UserManager:
         self.record_size = 36 # 10 + 10 + 4 + 4 + 4 + 4
 
     def save_data(self):
+        """Lưu dữ liệu người dùng vào file nhị phân."""
         if self.is_empty():
             return
             
@@ -45,6 +46,7 @@ class UserManager:
                 current = current.next
 
     def load_data(self):
+        """Tải dữ liệu người dùng từ file nhị phân."""
         if not os.path.exists(self.file_path):
             return
 
@@ -66,6 +68,7 @@ class UserManager:
                 user_node.best_streak  = int.from_bytes(data[32:36], 'little')
 
     # def load_data(self):
+    #"""Tải dữ liệu người dùng từ file văn bản."""
     #     with open(self.file_path, "r") as f:
     #         for i in f.readlines():
     #             user = i.strip().split("|")
@@ -76,6 +79,7 @@ class UserManager:
     #             user_node.best_streak = int(user[4])
 
     # def save_data (self):
+    # """Lưu dữ liệu người dùng vào file văn bản."""
     #     if self.is_empty():
     #         print("Nothing to save")
     #         return
@@ -87,15 +91,18 @@ class UserManager:
     #             current = current.next
 
     def insert_at_beginning(self, username, password):
+        """Chèn một người dùng mới vào đầu danh sách liên kết."""
         new_node = UserNode(username, password)
         new_node.next = self.head
         self.head = new_node
         return new_node
 
     def is_empty(self):
+        """Kiểm tra xem danh sách người dùng có rỗng hay không."""
         return self.head == None
     
     def update_data(self, username, is_win):
+        """Cập nhật dữ liệu người dùng sau mỗi trận chơi."""
         user = self.get_player(username)
         user.games_played +=1
         if is_win == True:
@@ -108,6 +115,7 @@ class UserManager:
 
 
     def get_player(self, username):
+        """Lấy thông tin người dùng dựa trên tên đăng nhập."""
         # if self.is_empty():
         #     user = self.create_new_player(username, password)
         # elif self.player_is_exist(username) == False:
@@ -118,11 +126,13 @@ class UserManager:
 
 
     def create_new_player(self, username, password):
+        """Tạo một người dùng mới và thêm vào danh sách."""
         new_user = self.insert_at_beginning(username, password)
         return new_user
 
 
     def player_is_exist(self,username):
+        """Kiểm tra xem người dùng có tồn tại trong danh sách hay không."""
         if self.is_empty():
             print("not exist")
             return
@@ -134,11 +144,13 @@ class UserManager:
         return False
 
     def player_statistics(self,username, password):
+        """Lấy thống kê người chơi dưới dạng chuỗi."""
         user = self.get_player(username, password)
         return(f"{user.games_played}{user.total_wins}{user.cur_streak}{user.best_streak}")
 
 
     def ranking_total_games(self):
+            """Lấy bảng xếp hạng người chơi dựa trên số trận đã chơi."""
             if self.is_empty():
                 print("No player")
                 return
@@ -149,7 +161,6 @@ class UserManager:
                 rank_list.append(itr) 
                 itr = itr.next
             
-
             rank_list.sort(key=lambda x: x.games_played, reverse=True)
             top_5 = rank_list[:5]
             list = []
@@ -159,6 +170,7 @@ class UserManager:
             return list
     
     def ranking_total_wins_games(self):
+            """Lấy bảng xếp hạng người chơi dựa trên số trận thắng."""
             if self.is_empty():
                 print("No player")
                 return

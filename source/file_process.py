@@ -3,6 +3,7 @@ valid_words_n = "source/data/words_data/valid_word_with_length_n.txt"
 words_n = "source/data/words_data/word_with_length_n.txt"
 
 def choose_file(n,file_input,file_output):
+    """Chọn từ có độ dài n và lưu vào file mới."""
     valid_word =[]
     with open (file_input, "r") as common_wf:
         for i in common_wf :

@@ -13,9 +13,11 @@ class Wordle:
         pass
 
     def attempt(self, answer):
+        """Thêm từ đoán vào danh sách các lần đoán."""
         self.attempts.append(answer)
 
     def attempts_remaining(self):
+        """Trả về số lần đoán còn lại."""
         left = self.MAX_ATTEMPTS - len(self.attempts)
         return left
     
@@ -45,18 +47,21 @@ class Wordle:
         return result
     
     def is_solved(self):
+        """Kiểm tra xem trò chơi đã được giải quyết hay chưa."""
         if self.attempts[-1] == self.secret:
             return True
         else:
             return False
         
     def can_attempts(self):
+        """Kiểm tra xem người chơi còn lượt đoán hay không."""
         if self.attempts_remaining() > 0:
             return True
         else:
             return False
         
     def undo(self):
+        """Hoàn tác lần đoán cuối cùng."""
         if not self.attempts:
             st.warning("Nothing to undo")
             return
@@ -65,6 +70,7 @@ class Wordle:
         return
     
     def redo(self):
+        """Làm lại lần đoán đã hoàn tác."""
         if not self.redo_stack:
             st.warning("Nothing to redo")
             return

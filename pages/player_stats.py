@@ -3,6 +3,7 @@ import streamlit as st
 
 
 def navigation():
+    """Hiển thị thanh điều hướng giữa các trang."""
     col1, col2, col3 = st.columns([1.5, 2, 2])
     with col1:
         if st.button("Trang chủ", icon= "🏠", use_container_width=True):

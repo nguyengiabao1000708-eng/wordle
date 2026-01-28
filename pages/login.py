@@ -1,8 +1,8 @@
 import streamlit as st
 from source import UserManager
 
-
 def sign_up(um):
+    """Hiển thị biểu mẫu đăng ký và xử lý đăng ký người dùng mới."""
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         with st.container(border=True):
@@ -22,53 +22,77 @@ def sign_up(um):
                             um.create_new_player(username, password)
                             um.save_data()
                             st.success("Sign up successful! You can now log in.")
+            st.write("Already have an account?")
+            if st.button("Back to Log in"):
+                st.session_state.auth_mode = "Log in"
+                st.rerun()
 
+def log_in(um):
+    """Hiển thị biểu mẫu đăng nhập và xử lý xác thực người dùng."""
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        with st.container(border=True):
+            st.markdown("## Log in WORDLE")
+            with st.form("log_in_form"):
+                username = st.text_input("Username", max_chars=10, placeholder="a-z, A-Z, 0-9 only")
+                password = st.text_input("Password", type="password", max_chars=10, placeholder="a-z, A-Z, 0-9 only")
+                submitted = st.form_submit_button("Submit")
+                if submitted:
+                    if um.player_is_exist(username):
+                        user = um.get_player(username)
+                        if user.password == password:
+                            st.success("Log in successful!")
+                            st.session_state["username"] = username
+                            st.session_state["game_over"] = False
+                            st.session_state["is_win"] = False
+                            st.session_state.auth_mode = "after_log_in"
+                            st.rerun()
+                        else:
+                            st.error("Incorrect password. Please try again.")
+                    else:
+                        st.error("Username does not exist.")
+            st.write("Don't have an account?")
+            if st.button("Sign Up"):
+                st.session_state.auth_mode = "signup"
+                st.rerun()
 
-def sign_in(um):
-    with st.form("login_form"):
-        username = st.text_input("Username", max_chars=10, placeholder="a-z, A-Z, 0-9 only")
-        password = st.text_input("Password", type="password", max_chars=10, placeholder="a-z, A-Z, 0-9 only")
-        submitted = st.form_submit_button("Submit")
-        if submitted:
-            if um.player_is_exist(username):
-                user = um.get_player(username)
-                if user.password == password:
-                    st.success("Login successful!")
-                    st.session_state["username"] = username
-                    st.session_state["game_over"] = False
-                    st.session_state["is_win"] = False
-                    st.switch_page("demo_streamlit.py")
-                else:
-                    st.error("Incorrect password. Please try again.")
-            else:
-                st.error("Username does not exist.")
+def after_log_in(um):
+    """Xử lý sau khi người dùng đăng nhập thành công."""
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        with st.container(border=True):
+            st.markdown("## Welcome to Wordle!")
+            st.write(f"Hello, {st.session_state['username']}!")
+            st.write("You are now logged in.")
 
+            cola, colb = st.columns([1, 1])
+            with cola:
+                if st.button("Start Game"):
+                        st.switch_page("demo_streamlit.py")
+            with colb:
+                if st.button("Log out"):
+                    st.session_state.auth_mode = "Log in"
+                    del st.session_state.is_win
+                    del st.session_state.wordle
+                    del st.session_state.game_overcd 
+                    del st.session_state.cur_guess
+                    del st.session_state.has_saved
+                    st.rerun()
 def main():
-    st.set_page_config(page_title="Login", layout="centered")
+    st.set_page_config(page_title="Log in", layout="centered")
 
     if "auth_mode" not in st.session_state:
-        st.session_state.auth_mode = "login"
+        st.session_state.auth_mode = "Log in"
 
     um = UserManager()
     um.load_data()
 
-    if st.session_state.auth_mode == "login":
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            with st.container(border=True):
-                st.markdown("## LOG IN WORDLE")
-                sign_in(um)
-                st.write("Don't have an account?")
-
-                if st.button("Sign Up"):
-                    st.session_state.auth_mode = "signup"
-                    st.rerun()
-
+    if st.session_state.auth_mode == "Log in":
+        log_in(um)
     elif st.session_state.auth_mode == "signup":
         sign_up(um)
-        if st.button("Back to Login"):
-            st.session_state.auth_mode = "login"
-            st.rerun()
+    elif st.session_state.auth_mode == "after_log_in":
+        after_log_in(um)
 
 if __name__ == "__main__":
     main()

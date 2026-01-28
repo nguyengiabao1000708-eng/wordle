@@ -3,8 +3,8 @@ import random
 from source import Wordle, UserManager
 import source.file_process as f
 
-#Hàm khởi tạo
 def init_states():
+    """Khởi tạo các biến trạng thái cần thiết trong session_state."""
     if "wordle" not in st.session_state:
         st.session_state.wordle = Wordle(get_random_word("source/data/words_data/valid_word_with_length_n.txt"))
         st.session_state.game_over = False
@@ -21,6 +21,7 @@ def init_states():
         st.session_state.has_saved = False
 
 def change_mode():
+    """Cho phép người dùng thay đổi chế độ chơi và độ khó."""
     with st.popover("Đổi Mode", icon= "😎"):
         st.write(f"Mode Hiện tại: {st.session_state.mode}, {st.session_state.diff} ")
         st.write("Chọn chế độ:")
@@ -50,6 +51,7 @@ def change_mode():
         d3.button("Hard", on_click=handle_diff_change, args=("hard",))
 
 def username():
+    """Cho phép người dùng nhập tên đăng nhập."""
     def save_name():
         if st.session_state.temp:
             st.session_state.username = st.session_state.temp
@@ -62,6 +64,7 @@ def username():
 
 
 def navigation():
+    """Thanh điều hướng giữa các trang."""
     col1, col2, col3, col4 = st.columns([1.5, 2, 2, 1.2])
     with col1:
         change_mode()
@@ -73,21 +76,25 @@ def navigation():
         if st.button("Bảng xếp hạng", icon= "📉", use_container_width=True):
             st.switch_page("pages/ranking.py")
     with col4:
-        username()
+        if st.button("Login", icon= "👤", use_container_width=True):
+            st.switch_page("pages/login.py")
 
 
 
 #Bàn phím và các thao tác
 def add_char(char, length_limit):
+    """Thêm ký tự vào đoán hiện tại nếu chưa đạt giới hạn độ dài."""
     if len(st.session_state.cur_guess) < length_limit:
         st.session_state.cur_guess += char
     else:
         st.warning("Đã đủ chữ!")
 
 def del_char():
+    """Xóa ký tự cuối cùng khỏi đoán hiện tại."""
     st.session_state.cur_guess = st.session_state.cur_guess[:-1]
 
 def math_logic(guess):
+    """Kiểm tra tính hợp lệ của biểu thức toán học."""
     a, b = guess.split("=")
     if guess.count('=') != 1:
         st.warning("Biểu thức phải chứa ĐÚNG một dấu '='")
@@ -101,6 +108,7 @@ def math_logic(guess):
         st.warning("2 vế PHẢI bằng nhau")
 
 def submit_char(length_limit, wordle):
+    """Xử lý khi người dùng nhấn nút ENTER để gửi đoán."""
     guess = st.session_state.cur_guess
     if len(guess) < len(wordle.secret):
         st.warning(f"Vui lòng nhập đủ {wordle.secret} chữ cái!")
@@ -122,6 +130,7 @@ def submit_char(length_limit, wordle):
     st.session_state.cur_guess = ""
 
 def get_disabled_chars(wordle):
+    """Lấy danh sách các ký tự đã bị vô hiệu hóa trên bàn phím."""
     disabled_chars = []
     for guess in wordle.attempts:
         for char in guess:
@@ -130,6 +139,7 @@ def get_disabled_chars(wordle):
     return set(disabled_chars)
 
 def render_keyboard(length_limit, wordle):
+    """Hiển thị bàn phím ảo và xử lý các nút bấm."""
     if st.session_state.mode != "math":
         if  st.session_state.mode == "vietnamese":
             keys = ["QWERTYUIOP", "ASDFGHJKL", "ZXCV BNM"]
@@ -146,7 +156,7 @@ def render_keyboard(length_limit, wordle):
             row1[i].button(char, on_click = add_char, args = (char, length_limit),
                             use_container_width = True,type = color )
             
-        row2 = st.columns([1.5] + [1]*len(keys[1]) + [1.5])
+        row2 = st.columns([1.4] + [1]*len(keys[1]) + [1.4])
 
         row2[0].button("UNDO", on_click = wordle.undo,
                         use_container_width = True)
@@ -214,6 +224,7 @@ def render_keyboard(length_limit, wordle):
 
 #Bảng hiện chữ
 def render_wordle_board(attempts, wordle):
+    """Hiển thị bảng trò chơi Wordle với các trạng thái đoán."""
     cur = st.session_state.cur_guess
     board_html = "<div class = 'wordle-grid'>"
 
@@ -250,13 +261,14 @@ def render_wordle_board(attempts, wordle):
 
 
 #Linh tinh 
-
 def local_css(file_name):
+    """Đọc file CSS và áp dụng các kiểu dáng cho ứng dụng Streamlit."""
     with open (file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 local_css("source/static/style.css")
 
 def get_random_word(file_path):
+    """Lấy một từ ngẫu nhiên từ file dữ liệu từ."""
     try:
         with open(file_path, "r") as file:
             word_list = file.readlines()
@@ -267,6 +279,7 @@ def get_random_word(file_path):
         return None
     
 def check_valid_words(word, file_path):
+    """Kiểm tra xem từ có tồn tại trong file dữ liệu từ hay không."""
     try:
         with open(file_path, "r") as file:
             word_list = {line.strip().upper() for line in file}
@@ -275,16 +288,16 @@ def check_valid_words(word, file_path):
         return False
     
 def already_guessed(guess, wordle):
+    """Kiểm tra xem từ đã được đoán trước đó hay chưa."""
     return guess in wordle.attempts
 
 
 
 # HÀM CHÍNH
 def main():
-    st.set_page_config(page_title="Wordle HCMUS", layout="centered", initial_sidebar_state="collapsed")
-    st.title("Wordle Minimalist")
-
+    st.set_page_config(page_title="Wordle HCMUS", layout="centered", initial_sidebar_state= "collapsed")
     init_states()
+
     wordle = st.session_state.wordle
     target = wordle.secret
     user_manager = UserManager()
@@ -292,33 +305,16 @@ def main():
 
     username = st.session_state.username
     user = user_manager.get_player(username)
-    st.write(username)
+    if username:
+        st.title(f"Welcome, {username}")
+    else:
+        st.title("Welcome to Wordle!")
 
     navigation()
     render_wordle_board(wordle.attempts, wordle)
     if user:
         if st.session_state.game_over == False:
             render_keyboard(len(target), wordle)
-
-        # if not st.session_state.game_over:
-        #     guess = st.text_input("Guess the word: ", max_chars = len(target)).upper()
-            
-        #     if st.button("enter"):
-        #         if len(guess) < len(target):
-        #             st.warning(f"Vui lòng nhập đủ {target} chữ cái!")
-        #         elif already_guessed(guess,wordle):
-        #             st.warning("Từ này đã được đoán!")
-        #         elif not check_valid_words(guess,"source/data/words_data/word_with_length_n.txt"):
-        #             st.warning("Từ không tồn tại")
-        #         else:
-        #             wordle.attempts.append(guess)
-        #             if guess == target:
-        #                 st.session_state.game_over = True
-        #                 st.session_state.is_win = True
-        #             elif wordle.attempts_remaining() ==0 :
-        #                 st.session_state.game_over = True
-        #             st.rerun()  
-
         else:
 
             if not st.session_state.has_saved :
@@ -344,26 +340,15 @@ def main():
                 del st.session_state.cur_guess
                 del st.session_state.has_saved
                 st.rerun()
-    else:
+    else: 
         if st.session_state.game_over == False:
             render_keyboard(len(target), wordle)
         else:
-
-            # if not st.session_state.has_saved :
-            #     if st.session_state.is_win:
-            #             user_manager.update_data(username, True)
-            #     else:
-            #             user_manager.update_data(username, False)
-
-            #     if username:      
-            #         user_manager.save_data()
-
-            #     st.session_state.has_saved = True
-
             if st.session_state.is_win:
                 st.success(f"Chúc mừng! Bạn đã đoán đúng từ '{target}'")
             else:
                 st.error(f"Bạn đã thua! Từ đúng là '{target}'")
+            st.warning("Vui lòng đăng nhập để thông tin của bạn được lưu!")
         
             if st.button("new game"):
                 del st.session_state.is_win
